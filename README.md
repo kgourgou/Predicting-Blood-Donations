@@ -2,3 +2,5 @@
 
 This repo contains the files used for the prediction of [blood donations in this
 contest.](http://www.drivendata.org/competitions/2/page/7/) 
+
+But really, it's all empty and sad now. :-(
