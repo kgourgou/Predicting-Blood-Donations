@@ -26,9 +26,6 @@ library(caret)
 
 ```{r}
 tdata = read.csv("data/training.csv")
-
-tx = tdata[2:5]
-ty = tdata[6]
 ```
 
 
@@ -42,7 +39,7 @@ ty = tdata[6]
 I'll start off simply, by making a training/testing partition.
 
 ```{r}
-part1 = createDataPartition(ty[[1]], p = 0.8)
+part1 = createDataPartition(tdata[[1]], p = 0.8)
 str(part1)
 ```
 
@@ -60,7 +57,7 @@ More info on this function [here](http://topepo.github.io/caret/splitting.html)
 
 Read more [here](http://caret.r-forge.r-project.org/training.html)
 
-```{r}
+```{r, eval = FALSE}
 ?train
 ```
 
@@ -69,7 +66,26 @@ Read more [here](http://caret.r-forge.r-project.org/training.html)
 As a first try on this data, I'll use ordered logistic regression via the `polr` method in  `train()`. 
 
 ```{r}
-try1 = train(x = tx, y = ty)
+tx = train1[2:5]
+ty = as.factor(train1[[6]])
+try1 = train(x = tx, y = ty, method = "polr")
+```
+
+Note that since we're doing classification, `train()` expects `y` to be a factor. 
+
+Also I'm getting an error with `train`. Not very clear, but `warnings()` suggests that it wants more levels in `y`. Maybe *polr* doesn't work as a method in this case? 
+
+Try instead penalized logistic regression, using `method = "plr"`. 
+
+```{r}
+try2 = train(x = tx, y = ty, method = "plr")
+```
+
+Interesting. This asked if I wanted to install a package ( **stepPlr**). `warnings()` indicate a *computationally singular system*. But it worked. 
+
+```{r}
+str(try2, 1)
+summary(try2)
 ```
 
 
