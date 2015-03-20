@@ -1,0 +1,75 @@
+---
+title: "caret"
+author: "Mark Hagemann"
+date: "March 19, 2015"
+output: html_document
+---
+
+I'm using this project as an excuse to learn the [**caret**](http://topepo.github.io/caret/index.html) package. As I write this, I have only heard of caret, and never so much as installed it on my computer. Here goes!
+
+## 0. Load the package
+
+```{r}
+if(!require(caret)) {install.packages("caret"); library(caret)}
+vignette("caret")
+```
+
+I see that **caret** is something like a front-end for a whole bunch of other packages, which it merely *suggests*. 
+
+```{r}
+# install suggested packages:
+install.packages("caret", dependencies = c("Depends", "Suggests"))
+library(caret)
+```
+
+## 0.5: Load the training data:
+
+```{r}
+tdata = read.csv("data/training.csv")
+
+tx = tdata[2:5]
+ty = tdata[6]
+```
+
+
+## 1. Partition data
+
+- Use `createDataPartition()` to make a simple partition.
+- `createResample()` makes bootstap resamples.
+- `createFolds()` and `createMultiFolds()` make crossvalidation folds
+- `createTimeSlices()` for time-series data
+
+I'll start off simply, by making a training/testing partition.
+
+```{r}
+part1 = createDataPartition(ty[[1]], p = 0.8)
+str(part1)
+```
+
+Hmm. This only returns a vector of indices sampled from `1:nrow(tdata)`. It's not clear how this is useful enough to warrant its own funciton. Wouldn't it be more useful as a logical vector so that I could split the data into train and test by something like:
+
+```{r}
+part1_logi = 1:nrow(tdata) %in% part1[[1]]
+train1 = tdata[part1_logi, ]
+test1 = tdata[!part1_logi, ]
+```
+
+More info on this function [here](http://topepo.github.io/caret/splitting.html)
+
+## 2. function: `train`
+
+Read more [here](http://caret.r-forge.r-project.org/training.html)
+
+```{r}
+?train
+```
+
+`train` takes several arguments, one of which is `method`. This can be either a built-in regression or classification method (one of [these options](http://topepo.github.io/caret/bytag.html)), or a custom-built method. The list of built-in methods is long, and appears to include some pretty sophisticated ML methods.
+
+As a first try on this data, I'll use ordered logistic regression via the `polr` method in  `train()`. 
+
+```{r}
+try1 = train(x = tx, y = ty)
+```
+
+
